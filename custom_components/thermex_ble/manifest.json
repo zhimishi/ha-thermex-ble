@@ -7,6 +7,6 @@
   "documentation": "https://github.com/zhimishi/ha-thermex-ble",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/zhimishi/ha-thermex-ble/issues",
-  "requirements": ["thermex-ble @ git+https://github.com/zhimishi/thermex-ble@main"],
+  "requirements": ["thermex-ble@git+https://github.com/zhimishi/thermex-ble@main"],
   "version": "0.1.0"
 }

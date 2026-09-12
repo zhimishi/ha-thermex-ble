@@ -1,12 +1,12 @@
 {
   "domain": "thermex_ble",
   "name": "Thermex Range Hood (BLE)",
-  "codeowners": ["@srydning"],
+  "codeowners": ["@zhimishi"],
   "config_flow": true,
   "dependencies": ["bluetooth_adapters"],
-  "documentation": "https://github.com/srydning/ha-thermex-ble",
+  "documentation": "https://github.com/zhimishi/ha-thermex-ble",
   "iot_class": "local_push",
-  "issue_tracker": "https://github.com/srydning/ha-thermex-ble/issues",
+  "issue_tracker": "https://github.com/zhimishi/ha-thermex-ble/issues",
   "requirements": ["thermex-ble==0.1.0"],
   "version": "0.1.0"
 }

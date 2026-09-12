@@ -4,9 +4,9 @@ Local control of a Thermex range hood over Bluetooth LE. No cloud, no account,
 and no VoiceLink firmware requirement — this talks directly to the hood's BLE
 module.
 
-Built on [thermex-ble](https://github.com/srydning/thermex-ble), an unofficial
+Built on [thermex-ble](https://github.com/zhimishi/thermex-ble), an unofficial
 reverse engineered library. See its
-[PROTOCOL.md](https://github.com/srydning/thermex-ble/blob/main/PROTOCOL.md)
+[PROTOCOL.md](https://github.com/zhimishi/thermex-ble/blob/main/PROTOCOL.md)
 for how the protocol was worked out.
 
 ## Entities

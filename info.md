@@ -4,9 +4,9 @@ Local control of a Thermex range hood over Bluetooth LE. No cloud, no account,
 and no VoiceLink firmware requirement — this talks directly to the hood's BLE
 module.
 
-Built on [thermex-ble](https://github.com/srydning/thermex-ble), an unofficial
+Built on [thermex-ble](https://github.com/zhimishi/thermex-ble), an unofficial
 reverse engineered library. See its
-[PROTOCOL.md](https://github.com/srydning/thermex-ble/blob/main/PROTOCOL.md)
+[PROTOCOL.md](https://github.com/zhimishi/thermex-ble/blob/main/PROTOCOL.md)
 for how the protocol was worked out.
 
 ## Entities
@@ -31,7 +31,7 @@ doesn't — please open an issue.
 ### HACS
 
 1. HACS → three-dot menu → **Custom repositories**
-2. Add `https://github.com/srydning/ha-thermex-ble`, category **Integration**
+2. Add `https://github.com/zhimishi/ha-thermex-ble`, category **Integration**
 3. Install, then restart Home Assistant
 4. **Settings → Devices & services → Add integration → Thermex**
 

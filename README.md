@@ -31,7 +31,7 @@ doesn't — please open an issue.
 ### HACS
 
 1. HACS → three-dot menu → **Custom repositories**
-2. Add `https://github.com/zhimizhi/ha-thermex-ble`, category **Integration**
+2. Add `https://github.com/zhimishi/ha-thermex-ble`, category **Integration**
 3. Install, then restart Home Assistant
 4. **Settings → Devices & services → Add integration → Thermex**
 

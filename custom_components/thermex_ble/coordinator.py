@@ -35,13 +35,15 @@ class ThermexCoordinator(DataUpdateCoordinator[HoodState]):
             self.hass, self.address.upper(), connectable=True
         )
         if ble_device is None:
-            # Expected on a cold start: the hood is silent unless it was
-            # recently power-cycled, so Home Assistant may not have seen an
-            # advertisement yet. Connecting by address still works.
-            _LOGGER.debug(
-                "No advertisement cached for %s, connecting by address", self.address
+            # Home Assistant can only hand bleak a device it has heard
+            # advertise. This hood goes quiet while connected, so after a
+            # restart the cache may be empty until it is power-cycled.
+            # Raising ConfigEntryNotReady makes HA retry with backoff, which
+            # picks the hood up as soon as it advertises again.
+            raise ConfigEntryNotReady(
+                f"Thermex hood {self.address} has not been seen advertising yet. "
+                "Power-cycle the hood, and make sure no phone is connected to it."
             )
-            ble_device = self.address
 
         self.hood = ThermexHood(ble_device)
         self._unregister = self.hood.register_callback(self._handle_state)

@@ -1,0 +1,35 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add Thermex range hood",
+        "description": "Enter the hood's Bluetooth address. The hood only advertises briefly after a power cycle, so it usually cannot be discovered automatically. You can find the address with `bluetoothctl scan le` shortly after switching the hood's power off and on again.",
+        "data": {
+          "address": "Bluetooth address"
+        }
+      },
+      "confirm": {
+        "title": "Add Thermex range hood",
+        "description": "Set up the hood found at {address}?"
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect. Check the address, make sure no phone is connected to the hood, and that the hood is in range of Home Assistant or a Bluetooth proxy."
+    },
+    "abort": {
+      "already_configured": "This hood is already set up."
+    }
+  },
+  "entity": {
+    "fan": {
+      "hood_fan": {
+        "name": "Fan"
+      }
+    },
+    "light": {
+      "hood_light": {
+        "name": "Light"
+      }
+    }
+  }
+}

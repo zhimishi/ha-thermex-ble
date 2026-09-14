@@ -51,6 +51,10 @@ class ThermexCoordinator(DataUpdateCoordinator[HoodState]):
         try:
             await self.hood.connect()
         except Exception as err:  # noqa: BLE001 - bleak raises a wide range
+            try:
+                await self.async_shutdown()
+            except Exception:
+                _LOGGER.warning("Cleanup after failed connect failed", exc_info=True)
             raise ConfigEntryNotReady(
                 f"Could not connect to Thermex hood at {self.address}: {err}"
             ) from err

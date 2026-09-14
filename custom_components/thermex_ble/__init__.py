@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_ADDRESS, Platform
 from homeassistant.core import HomeAssistant
@@ -28,4 +30,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ThermexConfigEntry) -> 
     unloaded = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unloaded:
         await entry.runtime_data.async_shutdown()
+        # Give the proxy and hood time to resume advertising before reload.
+        await asyncio.sleep(1.5)
     return unloaded

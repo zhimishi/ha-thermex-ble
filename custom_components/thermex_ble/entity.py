@@ -26,6 +26,6 @@ class ThermexEntity(CoordinatorEntity[ThermexCoordinator]):
 
     @property
     def available(self) -> bool:
-        """Entities go unavailable when the radio link drops, not on stale data."""
+        """Link loss and stale status both make entities unavailable."""
         hood = self.coordinator.hood
         return super().available and hood is not None and hood.is_connected

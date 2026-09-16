@@ -1,0 +1,17 @@
+# Match the Home Assistant version used for recovery testing (Python 3.14).
+homeassistant==2026.7.3
+pytest>=8
+pytest-asyncio>=0.23
+ruff>=0.3
+# Check out the matching BLE library beside this integration.
+-e ../thermex-ble
+
+# Additional dependencies imported by HA Bluetooth/USB.
+aiousbwatcher==1.1.2
+serialx==1.8.2
+bleak==3.0.2
+bleak-retry-connector==4.6.1
+bluetooth-data-tools==1.29.18
+dbus-fast==5.0.22
+habluetooth==6.26.5
+aioesphomeapi==45.3.1

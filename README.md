@@ -69,3 +69,43 @@ connect. The hood's own control panel always works.
 ## Licence
 
 MIT. Not affiliated with or endorsed by Thermex.
+
+## Connection recovery
+
+After setup, the integration supervises the persistent BLE connection in the
+background. Fan and light become unavailable on disconnect, a failed command,
+or after 30 seconds without an unlocked status frame. The hood normally sends
+a frame roughly every second. A silent link is detected within the next
+5-second health check.
+
+Recovery releases the previous link, resolves the current Bluetooth device and
+proxy through Home Assistant again, and reconnects. Failed attempts are spaced
+5, 10, 20, 40, then at most 60 seconds apart, in addition to the time spent on
+connection/cleanup. Entities become available only after a fresh unlocked
+status has arrived. Fan and light commands are not replayed during recovery.
+
+The matching `thermex-ble` library changes add immediate disconnect callbacks,
+bounded connection/write operations, and cleanup when a proxy clears its
+connection flag without sending a disconnect callback. An older cached library
+is supported by the watchdog, but update both repositories to get all cleanup
+fixes. Publish/pin the library revision before releasing the integration; a
+cached Git `main` dependency should not be assumed to refresh automatically.
+
+### Development tests
+
+Check out `ha-thermex-ble` and `thermex-ble` beside each other. Using Python 3.14,
+from `ha-thermex-ble`:
+
+```sh
+python -m venv .venv
+. .venv/bin/activate
+pip install -r requirements-dev.txt
+python -m pytest
+python -m pytest ../thermex-ble/tests
+```
+
+Tests use Home Assistant 2026.7.3 and simulated BLE clients; no radio connection
+or physical fan/light command is made. They cover proxy loss, stale status,
+repeated failed attempts, missing disconnect callbacks, command timeouts, and
+shutdown while reconnecting. A physical proxy reboot test remains necessary
+before deployment.

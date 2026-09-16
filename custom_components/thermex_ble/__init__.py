@@ -17,11 +17,15 @@ type ThermexConfigEntry = ConfigEntry[ThermexCoordinator]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ThermexConfigEntry) -> bool:
     """Set up a hood from a config entry."""
-    coordinator = ThermexCoordinator(hass, entry.data[CONF_ADDRESS])
+    coordinator = ThermexCoordinator(hass, entry.data[CONF_ADDRESS], config_entry=entry)
     await coordinator.async_setup()
 
     entry.runtime_data = coordinator
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    try:
+        await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    except (Exception, asyncio.CancelledError):
+        await coordinator.async_shutdown()
+        raise
     return True
 
 

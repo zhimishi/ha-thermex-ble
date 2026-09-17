@@ -5,12 +5,13 @@ from dataclasses import replace
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-from custom_components.thermex_ble import coordinator as module
-from custom_components.thermex_ble.coordinator import ThermexCoordinator
-from custom_components.thermex_ble.entity import ThermexEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady, HomeAssistantError
 from thermex_ble import HoodState
+
+from custom_components.thermex_ble import coordinator as module
+from custom_components.thermex_ble.coordinator import ThermexCoordinator
+from custom_components.thermex_ble.entity import ThermexEntity
 
 STATE = HoodState(2, 45, 80, 10, 0, 930, True, b"")
 
@@ -106,13 +107,16 @@ async def test_missing_disconnect_callback_is_detected(setup):
     await eventually(lambda: len(hoods) == 2 and coordinator.last_update_success)
 
 
-async def test_silent_but_connected_link_is_replaced(setup):
+async def test_silent_but_connected_link_stays_available(setup):
     coordinator, hoods, _, _ = setup
     await coordinator.async_setup()
     old = hoods[0]
-    coordinator._last_state_at -= module.STATE_TIMEOUT + 1
-    await eventually(lambda: len(hoods) == 2 and coordinator.last_update_success)
-    old.disconnect.assert_awaited_once()
+    coordinator._last_state_at -= 3600  # an hour without a notification
+    await asyncio.sleep(module.HEALTH_CHECK_INTERVAL * 3)
+    assert len(hoods) == 1
+    assert coordinator.last_update_success
+    assert ThermexEntity(coordinator).available
+    old.disconnect.assert_not_awaited()
 
 
 async def test_retries_continue_with_capped_backoff(setup):
@@ -172,7 +176,7 @@ async def test_cleanup_failure_does_not_open_another_link(setup):
     await coordinator.async_setup()
     old = hoods[0]
     old.disconnect.side_effect = TimeoutError("old proxy still owns link")
-    coordinator._last_state_at -= module.STATE_TIMEOUT + 1
+    old.is_connected = False  # callback was missed
     await eventually(lambda: old.disconnect.await_count >= 2)
     assert coordinator.hood is old
     assert len(hoods) == 1
@@ -289,12 +293,14 @@ async def test_legacy_library_without_disconnect_subscription_recovers(setup):
     await eventually(lambda: len(hoods) == 2 and coordinator.last_update_success)
 
 
-async def test_locked_frames_do_not_hide_stale_connection(setup):
+async def test_locked_frames_do_not_replace_known_state(setup):
     coordinator, hoods, _, _ = setup
     await coordinator.async_setup()
-    coordinator._last_state_at -= module.STATE_TIMEOUT + 1
-    hoods[0].state_callbacks[0](replace(STATE, unlocked=False))
-    await eventually(lambda: len(hoods) == 2 and coordinator.last_update_success)
+    prior_report = coordinator._last_state_at
+    hoods[0].state_callbacks[0](replace(STATE, speed=4, unlocked=False))
+    assert coordinator.data == STATE
+    assert coordinator._last_state_at == prior_report
+    assert coordinator.last_update_success
 
 
 @pytest.mark.parametrize("with_disconnect_callback", [False, True])

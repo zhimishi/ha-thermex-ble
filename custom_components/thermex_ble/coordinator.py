@@ -19,7 +19,6 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 HEALTH_CHECK_INTERVAL = 5.0
-STATE_TIMEOUT = 30.0
 CONNECT_TIMEOUT = 60.0
 DISCONNECT_TIMEOUT = 25.0
 COMMAND_TIMEOUT = 10.0
@@ -30,8 +29,8 @@ RETRY_MAX = 60.0
 class ThermexCoordinator(DataUpdateCoordinator[HoodState]):
     """Keep one BLE link alive, without polling or replaying user commands.
 
-    The hood normally pushes a status frame every second. A watchdog also
-    handles links that remain nominally connected but stop delivering data.
+    The hood reports its state through notifications. An idle but connected
+    hood remains available; the watchdog handles missing disconnect callbacks.
     """
 
     def __init__(
@@ -75,7 +74,6 @@ class ThermexCoordinator(DataUpdateCoordinator[HoodState]):
             and self.hood is not None
             and self.hood.is_connected
             and self._last_state_at is not None
-            and self.hass.loop.time() - self._last_state_at < STATE_TIMEOUT
         )
 
     async def _async_connect(self) -> None:
@@ -134,7 +132,7 @@ class ThermexCoordinator(DataUpdateCoordinator[HoodState]):
                 delay = HEALTH_CHECK_INTERVAL
                 retry_delay = RETRY_INITIAL
                 continue
-            self._mark_unavailable("Bluetooth connection lost or status updates stopped")
+            self._mark_unavailable("Bluetooth connection lost")
             try:
                 await self._async_connect()
             except Exception as err:  # bleak can raise several backend-specific errors

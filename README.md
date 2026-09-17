@@ -73,10 +73,15 @@ MIT. Not affiliated with or endorsed by Thermex.
 ## Connection recovery
 
 After setup, the integration supervises the persistent BLE connection in the
-background. Fan and light become unavailable on disconnect, a failed command,
-or after 30 seconds without an unlocked status frame. The hood normally sends
-a frame roughly every second. A silent link is detected within the next
-5-second health check.
+background. Fan and light become unavailable on disconnect or a failed command.
+The 5-second health check also detects a disconnected client if its proxy omits
+the disconnect callback. The integration does not disconnect an otherwise live
+link merely because no periodic status frame arrives; this was observed to
+cause a reconnect loop every 30–40 seconds with a Bluetooth proxy.
+If a proxy leaves the link marked connected but silently stops forwarding
+notifications, a change made on the hood's panel may remain stale until the
+next valid frame or a real disconnect. A read-only GATT probe would need
+verification on the physical hood before it can safely detect that case.
 
 Recovery releases the previous link, resolves the current Bluetooth device and
 proxy through Home Assistant again, and reconnects. Failed attempts are spaced
@@ -107,5 +112,5 @@ python -m pytest ../thermex-ble/tests
 Tests use Home Assistant 2026.7.3 and simulated BLE clients; no radio connection
 or physical fan/light command is made. They cover proxy loss, stale status,
 repeated failed attempts, missing disconnect callbacks, command timeouts, and
-shutdown while reconnecting. A physical proxy reboot test remains necessary
+shutdown while reconnecting and a live but quiet connection. A physical proxy reboot test remains necessary
 before deployment.
